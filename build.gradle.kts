@@ -1,5 +1,5 @@
 plugins {
-    java
+    id("java")
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -9,7 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -21,19 +21,28 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://repo.spring.io/milestone") }
 }
 
 extra["springAiVersion"] = "1.0.0"
+//extra["springAiVersion"] = "1.0.0-M6"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    //1.0.0
     implementation("org.springframework.ai:spring-ai-advisors-vector-store")
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc")
     implementation("org.springframework.ai:spring-ai-starter-model-ollama")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
     developmentOnly("org.springframework.ai:spring-ai-spring-boot-docker-compose")
+    //1.0.0-M6
+//    implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
+//    implementation("org.springframework.ai:spring-ai-spring-boot-starter-memory-repository-jdbc")
+//    implementation("org.springframework.ai:spring-ai-spring-boot-starter-vector-store-pgvector")
+//    implementation("org.springframework.ai:spring-ai-spring-boot-starter-tools")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

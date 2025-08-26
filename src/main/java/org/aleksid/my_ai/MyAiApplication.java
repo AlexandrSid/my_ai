@@ -24,7 +24,9 @@ public class MyAiApplication {
 
     public static void main(String[] args) {
         ChatClient chatClient = SpringApplication.run(MyAiApplication.class, args).getBean(ChatClient.class);
+        long startTIme = System.currentTimeMillis();
         System.out.println(chatClient.prompt().user("Дай первую строчку богемской рапсодии").call().content());
+        System.out.printf("Время выполнения заняло %d милисекунд", System.currentTimeMillis()-startTIme);
     }
 
 }
