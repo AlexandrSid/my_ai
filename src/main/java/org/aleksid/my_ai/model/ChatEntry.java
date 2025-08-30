@@ -8,21 +8,23 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Chat {
+public class ChatEntry {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
+
+    private String content;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "chat_id")
-    private List<ChatEntry> history;
 }

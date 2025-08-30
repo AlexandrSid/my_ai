@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${chat != null} ? 'Borisov GPT — ' + chat.title : 'Borisov GPT'">Borisov GPT</title>
+    <title th:text="${chat != null} ? 'My local GPT — ' + chat.title : 'My local GPT'">My local GPT</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/chat.css}"/>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script defer th:src="@{/js/chat.js}"></script>
@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-top">
-            <h1>Borisov GPT</h1>
+            <h1>My local GPT</h1>
 
 
             <!-- Chat list -->
