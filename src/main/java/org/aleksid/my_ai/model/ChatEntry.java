@@ -19,7 +19,7 @@ public class ChatEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = 4096)
+    @Column(columnDefinition = "text")
     private String content;
 
     @Enumerated(EnumType.STRING)

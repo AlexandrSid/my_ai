@@ -2,13 +2,16 @@ package org.aleksid.my_ai.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.aleksid.my_ai.model.Chat;
 import org.aleksid.my_ai.model.ChatEntry;
 import org.aleksid.my_ai.model.Role;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -55,5 +58,29 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId).orElseThrow();
         ChatEntry entry = ChatEntry.builder().role(role).content(prompt).build();
         chat.addEntry(entry);
+    }
+
+    public SseEmitter proceedInteractionWithStreaming(Long chatId, String userPrompt) {
+        selfProxy.addChatEntry(chatId, userPrompt, USER);
+
+        StringBuilder answerAccumulator = new StringBuilder();
+
+        SseEmitter sseEmitter = new SseEmitter(0L);
+        chatClient.prompt().user(userPrompt).stream()
+                .chatResponse()
+                .subscribe(chatResponse -> processToken(chatResponse, sseEmitter, answerAccumulator),
+                        sseEmitter::completeWithError,
+                        ()-> selfProxy.addChatEntry(chatId, answerAccumulator.toString(), ASSISTANT)
+                );
+
+        return sseEmitter;
+    }
+
+
+    @SneakyThrows
+    private static void processToken(ChatResponse chatResponse, SseEmitter sseEmitter, StringBuilder answerAccumulator) {
+        var token = chatResponse.getResult().getOutput();
+        answerAccumulator.append(token.getText());
+        sseEmitter.send(token);
     }
 }
