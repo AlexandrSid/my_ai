@@ -25,4 +25,8 @@ public class Chat {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "chat_id")
     private List<ChatEntry> history;
+
+    public void addEntry(ChatEntry entry) {
+        history.add(entry);
+    }
 }
