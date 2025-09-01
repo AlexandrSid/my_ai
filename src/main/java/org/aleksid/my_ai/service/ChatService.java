@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.aleksid.my_ai.model.Chat;
 import org.aleksid.my_ai.model.ChatEntry;
+import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.model.Role;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import static org.aleksid.my_ai.model.Role.USER;
 public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatClient chatClient;
+    private final PostgresChatMemory postgresChatMemory;
 
     @Autowired
     private ChatService selfProxy;
@@ -61,17 +64,21 @@ public class ChatService {
     }
 
     public SseEmitter proceedInteractionWithStreaming(Long chatId, String userPrompt) {
-        selfProxy.addChatEntry(chatId, userPrompt, USER);
-
-        StringBuilder answerAccumulator = new StringBuilder();
+        final StringBuilder answerAccumulator = new StringBuilder();
 
         SseEmitter sseEmitter = new SseEmitter(0L);
-        chatClient.prompt().user(userPrompt).stream()
+        chatClient
+                .prompt().user(userPrompt)
+                .advisors(MessageChatMemoryAdvisor
+//                        .builder(MessageWindowChatMemory.builder().build())
+                        .builder(postgresChatMemory)
+                        .conversationId(String.valueOf(chatId))
+                        .build())
+                .stream()
                 .chatResponse()
                 .subscribe(chatResponse -> processToken(chatResponse, sseEmitter, answerAccumulator),
-                        sseEmitter::completeWithError,
-                        ()-> selfProxy.addChatEntry(chatId, answerAccumulator.toString(), ASSISTANT)
-                );
+                        sseEmitter::completeWithError);
+
 
         return sseEmitter;
     }

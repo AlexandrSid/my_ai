@@ -48,3 +48,20 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     });
 });
+document.addEventListener('DOMContentLoaded', function() {
+    const messageBubbles = document.querySelectorAll('.message.mentor .bubble');
+
+    messageBubbles.forEach(bubble => {
+        // Получаем текст из элемента.
+        // Примечание: Thymeleaf с th:text уже поместил сюда чистый текст.
+        // С th:utext это будет уже HTML, поэтому этот шаг нужен только если вы
+        // НЕ изменили HTML на th:utext.
+        const markdownText = bubble.textContent;
+
+        // Преобразуем Markdown в HTML.
+        const htmlContent = marked.parse(markdownText);
+
+        // Вставляем HTML обратно в элемент.
+        bubble.innerHTML = htmlContent;
+    });
+});

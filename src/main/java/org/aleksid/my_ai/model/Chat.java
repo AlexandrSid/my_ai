@@ -29,4 +29,8 @@ public class Chat {
     public void addEntry(ChatEntry entry) {
         history.add(entry);
     }
+
+    public void addEntries(List<ChatEntry> entries) {
+        history.addAll(entries);
+    }
 }
