@@ -32,6 +32,6 @@ public class PostgresChatMemory implements ChatMemory {
 
     @Override
     public void clear(String conversationId) {
-        //not implemented
+        //not implemented NEVER
     }
 }

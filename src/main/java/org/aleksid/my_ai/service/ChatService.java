@@ -9,7 +9,7 @@ import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.model.Role;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,11 +69,7 @@ public class ChatService {
         SseEmitter sseEmitter = new SseEmitter(0L);
         chatClient
                 .prompt().user(userPrompt)
-                .advisors(MessageChatMemoryAdvisor
-//                        .builder(MessageWindowChatMemory.builder().build())
-                        .builder(postgresChatMemory)
-                        .conversationId(String.valueOf(chatId))
-                        .build())
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .stream()
                 .chatResponse()
                 .subscribe(chatResponse -> processToken(chatResponse, sseEmitter, answerAccumulator),
