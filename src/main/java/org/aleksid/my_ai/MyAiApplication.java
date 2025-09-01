@@ -1,12 +1,12 @@
 package org.aleksid.my_ai;
 
 import lombok.RequiredArgsConstructor;
+import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,18 +35,14 @@ public class MyAiApplication {
     }
 
     private ChatMemory getChatMemory() {
-        return MessageWindowChatMemory.builder()
-                .maxMessages(2)
+        return PostgresChatMemory.builder()
                 .chatMemoryRepository(chatRepository)
+                .maxMessages(2)
                 .build();
     }
 
     public static void main(String[] args) {
         SpringApplication.run(MyAiApplication.class, args);
-//        ChatClient chatClient = SpringApplication.run(MyAiApplication.class, args).getBean(ChatClient.class);
-//        long startTIme = System.currentTimeMillis();
-//        System.out.println(chatClient.prompt().user("Дай первую строчку богемской рапсодии").call().content());
-//        System.out.printf("Время выполнения заняло %d милисекунд", System.currentTimeMillis()-startTIme);
     }
 
 }

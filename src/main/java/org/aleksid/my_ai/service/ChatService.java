@@ -25,7 +25,6 @@ import static org.aleksid.my_ai.model.Role.USER;
 public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatClient chatClient;
-    private final PostgresChatMemory postgresChatMemory;
 
     @Autowired
     private ChatService selfProxy;
@@ -74,7 +73,6 @@ public class ChatService {
                 .chatResponse()
                 .subscribe(chatResponse -> processToken(chatResponse, sseEmitter, answerAccumulator),
                         sseEmitter::completeWithError);
-
 
         return sseEmitter;
     }
