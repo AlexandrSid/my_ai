@@ -6,7 +6,10 @@ import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +19,11 @@ import org.springframework.context.annotation.Bean;
 public class MyAiApplication {
 
     private final ChatRepository chatRepository;
+    private final VectorStore vectorStore;
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultAdvisors(getAdvisor()).build();
+        return builder.defaultAdvisors(getHistoryAdvisor(), getRagAdvisor()).build();
 //        return builder.defaultOptions(
 //                ChatOptions.builder()
 //                        .topP(0.9)
@@ -30,8 +34,13 @@ public class MyAiApplication {
 //                .build();
     }
 
-    private Advisor getAdvisor() {
+    private Advisor getHistoryAdvisor() {
         return MessageChatMemoryAdvisor.builder(getChatMemory()).build();
+    }
+
+    private Advisor getRagAdvisor() {
+        return QuestionAnswerAdvisor.builder(vectorStore)
+                .build();
     }
 
     private ChatMemory getChatMemory() {
