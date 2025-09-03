@@ -9,6 +9,8 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +22,22 @@ public class MyAiApplication {
 
     private final ChatRepository chatRepository;
     private final VectorStore vectorStore;
+
+    private static final PromptTemplate MY_PROMPT_TEMPLATE =
+            new PromptTemplate("""
+                    {query}
+                    
+                    Информация из контекста приведена ниже и окружена линиями ---------------------
+                    
+                    ---------------------
+                    {question_answer_context}
+                    ---------------------
+                    
+                    Основываясь на контексте и предоставленной истории, а не на собственных знаниях,
+                    ответь на комментарий пользователя. Если ответа нет в контексте, сообщи пользователю,
+                    что ты не можешь ответить на вопрос.
+                    
+                    """);
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
@@ -40,6 +58,10 @@ public class MyAiApplication {
 
     private Advisor getRagAdvisor() {
         return QuestionAnswerAdvisor.builder(vectorStore)
+                .promptTemplate(MY_PROMPT_TEMPLATE)
+                .searchRequest(
+                        SearchRequest.builder().topK(4).build()
+                )
                 .build();
     }
 
