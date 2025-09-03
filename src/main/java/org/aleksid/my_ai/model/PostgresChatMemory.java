@@ -5,7 +5,6 @@ import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Builder
@@ -24,9 +23,9 @@ public class PostgresChatMemory implements ChatMemory {
     @Override
     public List<Message> get(String conversationId) {
         Chat chat = chatMemoryRepository.findById(Long.valueOf(conversationId)).orElseThrow();
+        long messagesToSkip = Math.max(0, chat.getHistory().size() - maxMessages);
         return chat.getHistory().stream()
-                .sorted(Comparator.comparing(ChatEntry::getCreatedAt).reversed())
-                .limit(maxMessages)
+                .skip(messagesToSkip)
                 .map(ChatEntry::toMessage)
                 .toList();
     }

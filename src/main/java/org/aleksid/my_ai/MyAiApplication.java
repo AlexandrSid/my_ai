@@ -5,9 +5,9 @@ import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -26,22 +26,25 @@ public class MyAiApplication {
     private static final PromptTemplate MY_PROMPT_TEMPLATE =
             new PromptTemplate("""
                     {query}
-                    
+                                        
                     Информация из контекста приведена ниже и окружена линиями ---------------------
-                    
+                                        
                     ---------------------
                     {question_answer_context}
                     ---------------------
-                    
+                                        
                     Основываясь на контексте и предоставленной истории, а не на собственных знаниях,
                     ответь на комментарий пользователя. Если ответа нет в контексте, сообщи пользователю,
                     что ты не можешь ответить на вопрос.
-                    
+                                        
                     """);
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultAdvisors(getHistoryAdvisor(), getRagAdvisor()).build();
+        return builder.defaultAdvisors(getHistoryAdvisor()
+                /*, getRagAdvisor()*/
+                , SimpleLoggerAdvisor.builder().build()
+        ).build();
 //        return builder.defaultOptions(
 //                ChatOptions.builder()
 //                        .topP(0.9)
@@ -68,7 +71,7 @@ public class MyAiApplication {
     private ChatMemory getChatMemory() {
         return PostgresChatMemory.builder()
                 .chatMemoryRepository(chatRepository)
-                .maxMessages(2)
+                .maxMessages(8)
                 .build();
     }
 
