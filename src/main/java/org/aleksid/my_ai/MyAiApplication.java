@@ -10,6 +10,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -24,6 +25,7 @@ public class MyAiApplication {
 
     private final ChatRepository chatRepository;
     private final VectorStore vectorStore;
+    private final ChatModel chatModel;
 
     private static final PromptTemplate MY_PROMPT_TEMPLATE =
             new PromptTemplate("""
@@ -45,7 +47,7 @@ public class MyAiApplication {
     public ChatClient chatClient(ChatClient.Builder builder) {
         return builder
                 .defaultAdvisors(
-                        ExpansionQueryAdvisor.builder().order(0).build(),
+                        ExpansionQueryAdvisor.builder(chatModel).order(0).build(),
                         getHistoryAdvisor(10),
                         SimpleLoggerAdvisor.builder().order(20).build(),
                         getRagAdvisor(30),
