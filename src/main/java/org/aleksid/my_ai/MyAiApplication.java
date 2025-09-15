@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.aleksid.my_ai.adviser.expenstion.ExpansionQueryAdvisor;
 import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.repository.ChatRepository;
+import org.aleksid.my_ai.util.PrintUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -65,8 +66,8 @@ public class MyAiApplication {
     private Advisor getPrettySimpleLoggerAdvisor(int order) {
         return SimpleLoggerAdvisor
                 .builder()
-                .requestToString(request -> "Request:\n" + request.toString().replace(", ", ",\n  "))
-                .responseToString(response -> "Response:\n" + response.getResult().toString().replace(", ", ",\n  "))
+                .requestToString(request -> "Request:\n" + PrintUtils.prettyPrint(request.toString()))
+                .responseToString(response -> "Response:\n" + PrintUtils.prettyPrint(response.getResult().toString()))
                 .order(order)
                 .build();
     }
