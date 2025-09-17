@@ -1,4 +1,4 @@
-package org.aleksid.my_ai.adviser.expenstion;
+package org.aleksid.my_ai.advisor.expansion;
 
 import lombok.Builder;
 import org.springframework.ai.chat.client.ChatClient;

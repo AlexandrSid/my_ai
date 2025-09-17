@@ -1,7 +1,8 @@
 package org.aleksid.my_ai;
 
 import lombok.RequiredArgsConstructor;
-import org.aleksid.my_ai.adviser.expenstion.ExpansionQueryAdvisor;
+import org.aleksid.my_ai.advisor.expansion.ExpansionQueryAdvisor;
+import org.aleksid.my_ai.advisor.rag.RagAdvisor;
 import org.aleksid.my_ai.model.PostgresChatMemory;
 import org.aleksid.my_ai.repository.ChatRepository;
 import org.aleksid.my_ai.util.PrintUtils;
@@ -51,7 +52,8 @@ public class MyAiApplication {
                         ExpansionQueryAdvisor.builder(chatModel).order(0).build(),
                         getHistoryAdvisor(10),
                         getPrettySimpleLoggerAdvisor(20),
-                        getRagAdvisor(30),
+//                        getRagAdvisor(30),
+                        RagAdvisor.builder(vectorStore).order(30).build(),
                         getPrettySimpleLoggerAdvisor(40)
                 )
                 .defaultOptions(ChatOptions.builder()
