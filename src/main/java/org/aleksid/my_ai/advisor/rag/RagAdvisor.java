@@ -1,6 +1,7 @@
 package org.aleksid.my_ai.advisor.rag;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
@@ -20,11 +21,12 @@ import static org.aleksid.my_ai.advisor.expansion.ExpansionQueryAdvisor.ENRICHED
 public class RagAdvisor implements BaseAdvisor {
 
     private final static PromptTemplate FINAL_PROMPT_TEMPLATE = PromptTemplate.builder().template("""
-            Context: {context}
-            Question: {question}
+            CONTEXT: {context}
+            QUESTION: {question}
             """).build();
 
     private VectorStore vectorStore;
+    @Getter
     private final int order;
 
     public static RagAdvisorBuilder builder(VectorStore vectorStore) {
@@ -40,10 +42,12 @@ public class RagAdvisor implements BaseAdvisor {
                 SearchRequest.builder()
                         .query(queryToRag)
                         .topK(4)
-                        .similarityThreshold(0.6)
+                        .similarityThreshold(0.67)
                         .build());
         if (documents == null || documents.isEmpty()) {
-            return chatClientRequest;
+            return chatClientRequest.mutate()
+                    .context(Map.of("CONTEXT", "IT'S EMPTY HERE. VectorStore similarity search found nothing"))
+                    .build();
         }
         String llmContext = documents.stream()
                 .map(Document::getText)
@@ -64,8 +68,4 @@ public class RagAdvisor implements BaseAdvisor {
         return chatClientResponse;
     }
 
-    @Override
-    public int getOrder() {
-        return this.order;
-    }
 }

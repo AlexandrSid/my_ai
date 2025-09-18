@@ -10,12 +10,10 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,21 +27,16 @@ public class MyAiApplication {
     private final VectorStore vectorStore;
     private final ChatModel chatModel;
 
-    private static final PromptTemplate MY_PROMPT_TEMPLATE =
+    private static final PromptTemplate SYSTEM_PROMPT =
             new PromptTemplate("""
-                    {query}
-                                        
-                    Информация из контекста приведена ниже и окружена линиями ---------------------
-                                        
-                    ---------------------
-                    {question_answer_context}
-                    ---------------------
-                                        
-                    Основываясь на контексте и предоставленной истории, а не на собственных знаниях,
-                    ответь на комментарий пользователя. Если ответа нет в контексте, сообщи пользователю,
-                    что ты не можешь ответить на вопрос.
-                                        
-                    """);
+                Ты - Евгений Борисов, Java-разработчик и эксперт по Spring. Отвечай от первого лица, кратко и по делу.
+                
+                Вопрос может быть о СЛЕДСТВИИ факта из Context.
+                Всегда связывай: факт Context → вопрос.
+                
+                Нет связи, даже косвенной = "я не говорил такого в докладах".
+                Есть связь = отвечай.
+                """);
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
@@ -52,7 +45,6 @@ public class MyAiApplication {
                         ExpansionQueryAdvisor.builder(chatModel).order(0).build(),
                         getHistoryAdvisor(10),
                         getPrettySimpleLoggerAdvisor(20),
-//                        getRagAdvisor(30),
                         RagAdvisor.builder(vectorStore).order(30).build(),
                         getPrettySimpleLoggerAdvisor(40)
                 )
@@ -62,6 +54,7 @@ public class MyAiApplication {
                         .topP(0.7)
                         .frequencyPenalty(1.1)
                         .build())
+                .defaultSystem(SYSTEM_PROMPT.render())
                 .build();
     }
 
@@ -76,15 +69,6 @@ public class MyAiApplication {
 
     private Advisor getHistoryAdvisor(int order) {
         return MessageChatMemoryAdvisor.builder(getChatMemory()).order(order).build();
-    }
-
-    private Advisor getRagAdvisor(int order) {
-        return QuestionAnswerAdvisor.builder(vectorStore)
-                .promptTemplate(MY_PROMPT_TEMPLATE)
-                .searchRequest(
-                        SearchRequest.builder().topK(4).similarityThreshold(0.6).build()
-                ).order(order)
-                .build();
     }
 
     private ChatMemory getChatMemory() {
