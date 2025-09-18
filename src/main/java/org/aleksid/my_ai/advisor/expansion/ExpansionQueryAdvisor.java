@@ -17,31 +17,33 @@ import java.util.Map;
 public class ExpansionQueryAdvisor implements BaseAdvisor {
 
     private final static PromptTemplate EXPANSION_TEMPLATE = PromptTemplate.builder().template("""
-Instruction: Расширь поисковый запрос, добавив наиболее релевантные термины.
-                
-                СПЕЦИАЛИЗАЦИЯ ПО SPRING FRAMEWORK:
-                - Жизненный цикл Spring бинов: конструктор → BeanPostProcessor → PostConstruct → прокси → ContextListener
-                - Технологии: Dynamic Proxy, CGLib, reflection, аннотации, XML конфигурация
-                - Компоненты: BeanFactory, ApplicationContext, BeanDefinition, MBean, JMX
-                - Паттерны: dependency injection, AOP, профилирование, перехват методов
+            Instruction: Expand the search query by adding the most relevant terms.
+           
+            SPECIALIZATION: SPRING FRAMEWORK
+            Spring bean lifecycle: constructor → BeanPostProcessor → PostConstruct → proxy → ContextListener
+            Technologies: Dynamic Proxy, CGLib, reflection, annotations, XML configuration
+            Components: BeanFactory, ApplicationContext, BeanDefinition, MBean, JMX
+            Patterns: dependency injection, AOP, profiling, method interception
 
-                ПРАВИЛА:
-                1. Сохрани ВСЕ слова из исходного вопроса
-                2. Добавь МАКСИМУМ ПЯТЬ наиболее важных термина
-                3. Выбирай самые специфичные и релевантные слова
-                4. Результат - простой список слов через пробел
+            RULES:
+            Keep ALL words from the original question
+            Add UP TO FIVE of the most important terms
+            Choose the most specific and relevant words directly related to the topic of the question
+            Do not insert terms from unrelated domains (e.g., don’t add IT terms to medical questions)
+            The result must be a simple list of words separated by spaces
 
-                СТРАТЕГИЯ ВЫБОРА:
-                - Приоритет: специализированные термины
-                - Избегай общих слов
-                - Фокусируйся на ключевых понятиях
+            SELECTION STRATEGY:
+            Priority: domain-specific terms from the same field as the question
+            Avoid general words
+            Focus on key concepts
 
-                ПРИМЕРЫ:
-                "что такое спринг" → "что такое спринг фреймворк Java"
-                "как создать файл" → "как создать файл документ программа"
+            EXAMPLES:
+            "what is spring" → "what is spring framework Java"
+            "how to create a file" → "how to create a file document program"
+            "what are you allergic to" → "what are you allergic to immunity symptoms pollen reaction"
 
-                Question: {question}
-                Expanded query:
+            Question: {question}
+            Expanded query:
             """).build();
 
     public static final String ENRICHED_QUESTION = "ENRICHED_QUESTION";

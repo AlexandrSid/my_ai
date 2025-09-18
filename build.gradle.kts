@@ -34,6 +34,9 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc")
     implementation("org.springframework.ai:spring-ai-starter-model-ollama")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
+    implementation("com.github.pemistahl:lingua:1.2.2")
+    implementation("org.apache.lucene:lucene-core:10.2.2")
+    implementation("org.apache.lucene:lucene-analysis-common:10.2.2")
     developmentOnly("org.springframework.ai:spring-ai-spring-boot-docker-compose")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
